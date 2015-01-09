@@ -1,4 +1,4 @@
-# read dataset
+# read the dataset
 data <- read.csv("household_power_consumption.txt", sep=";", 
 								 colClasses="character", header=TRUE)
 
@@ -7,6 +7,8 @@ data <- read.csv("household_power_consumption.txt", sep=";",
 data <- transform(data, Time=paste(Date, Time))
 data <- transform(data, Time=strptime(Time, format="%d/%m/%Y %H:%M:%S"))
 data <- data[,2:9]
+colnames(data)[2]  <- "DateTime"
+
 
 # filter the dataset according to the desired time period
 data <- subset(data, as.Date(data$Time) >= as.Date("2007-02-01") & 
