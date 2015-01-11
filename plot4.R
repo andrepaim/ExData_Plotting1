@@ -1,34 +1,48 @@
+
+file.url <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+zip.file.name  <- "household_power_consumption.zip"
+file.name <- "household_power_consumption.txt"
+
+if (!file.exists(file.name))
+{
+	# download the dataset
+	download.file(file.url, destfile=zip.file.name, method="curl")
+
+	#unzip the dataset
+	unzip(zip.file.name)
+}
+
 # read the dataset
-data <- read.csv("household_power_consumption.txt", sep=";", 
+data <- read.csv(file.name, sep=";", 
 								 colClasses="character", header=TRUE)
 # merge Date and Time columns to one column named DateTime in the POSIXlt format
 data <- transform(data, Time=paste(Date, Time))
 data <- transform(data, Time=strptime(Time, format="%d/%m/%Y %H:%M:%S"))
 data <- data[,2:9]
-colnames(data)[2]  <- "DateTime"
+colnames(data)[1]  <- "DateTime"
 
 
 # filter the dataset according to the desired time period
-data <- subset(data, as.Date(data$Time) >= as.Date("2007-02-01") & 
-							 as.Date(data$Time) <= as.Date("2007-02-02"))
+data <- subset(data, as.Date(data$DateTime) >= as.Date("2007-02-01") & 
+							 as.Date(data$DateTime) <= as.Date("2007-02-02"))
 
 #plot data
 par(mfrow=c(2,2))
 
-with(data, plot(Time, Global_active_power, type="l", xlab="", ylab="Global Active Power"))
+with(data, plot(DateTime, Global_active_power, type="l", xlab="", ylab="Global Active Power"))
 
-with(data, plot(Time, Voltage, type="l", xlab="datetime", ylab="Voltage"))
+with(data, plot(DateTime, Voltage, type="l", xlab="datetime", ylab="Voltage"))
 
 with(data, {
-	plot(Time, Sub_metering_1, type="n", xlab="", ylab="Energy sub metering")
-	lines(Time, Sub_metering_1)
-	lines(Time, Sub_metering_2, col="red")
-	lines(Time, Sub_metering_3, col="blue")
+	plot(DateTime, Sub_metering_1, type="n", xlab="", ylab="Energy sub metering")
+	lines(DateTime, Sub_metering_1)
+	lines(DateTime, Sub_metering_2, col="red")
+	lines(DateTime, Sub_metering_3, col="blue")
 })
 legend("topright", col=c("black", "red", "blue"), bty="n", lty=c(1,1,1),
 			 legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"))
 
-with(data, plot(Time, Global_reactive_power, type="l", xlab="datetime"))
+with(data, plot(DateTime, Global_reactive_power, type="l", xlab="datetime"))
 
 # save png file
 dev.copy(png, file="plot4.png")
